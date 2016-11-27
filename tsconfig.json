@@ -1,0 +1,16 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "module": "commonjs",
+    "allowJs": true,
+    "target": "es6",
+    "sourceMap": true,
+    "types": []
+  },
+  "exclude": [
+    "node_modules",
+    "bin",
+    "built",
+    "templates"
+  ]
+}

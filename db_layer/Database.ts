@@ -3,46 +3,47 @@ import config from "../config/config";
 import logger from "../logger/winston";
 import DbLayerError from "../Error/DbLayerError";
 
-const url = config.get('mongodb:url');
 const MongoClient = mongodb.MongoClient;
 
 export default class Database {
-  db: mongodb.Db;
-  connectionString: string;
 
-  constructor(connectionURL?: string) {
-    if (connectionURL) {
-      this.connectionString = connectionURL;
-    } else {
-      this.connectionString = url;
-    }
-  }
+  static URL = config.get('mongodb:url');
 
-  connect(connectionURL?: string): Promise<mongodb.Db> {
+  static connect(connectionURL?: string): Promise<mongodb.Db> {
     return new Promise((resolve, reject) => {
+
+      let connectionString: string;
+
       if (connectionURL) {
-        this.connectionString = connectionURL;
+        connectionString = connectionURL;
+      } else {
+        connectionString = Database.URL;
       }
-      if (!this.connectionString) {
+
+      if (!connectionString) {
         logger.error('Empty database connection string');
         return reject(new DbLayerError('Empty database connection string'));
       }
-      logger.info('Database connect string', this.connectionString);
+      logger.info('Database connect string', connectionString);
 
-      MongoClient.connect(this.connectionString, function (err: mongodb.MongoError, db: mongodb.Db) {
+      MongoClient.connect(connectionString, function (err: mongodb.MongoError, db: mongodb.Db) {
         if (err) {
           logger.error('Database connection error!', {error: err});
           return reject(new DbLayerError(err));
         }
         logger.debug("Connected correctly to database server");
 
-        return resolve(this.db = db);
+        return resolve(db);
       })
     });
   }
 
-  close() {
-    return this.db.close();
+  static getCollection(db: mongodb.Db, collectionName: string): mongodb.Collection {
+      return db.collection(collectionName);
+  }
+
+  static close(db: mongodb.Db) {
+    return db.close();
   }
 }
 

@@ -5,51 +5,44 @@ import DbLayerError from "../Error/DbLayerError";
 import Database from "./Database";
 import Calculation from "../models/Calculation";
 
-let curDb: Database;
-
 export default class CalculationDataMapper {
 
-  static getClassName(){ return 'CalculationDataMapper'; }
+  static CALCULATIONS_COLLECTION_NAME: string = 'calculations';
 
-  static getCollection(connectionURL?: string): Promise<mongodb.Collection> {
-    return new Promise((resolve, reject) => {
-      const calculationsCollectionName = 'calculations';
-      // let collection: mongodb.Collection;
-      curDb = new Database(connectionURL);
-      curDb.connect()
-        .then(db => {
-          resolve(db.collection(calculationsCollectionName));
-        })
-        .catch(err => {
-          reject(err);
-        })
-    })
+  static getClassName() {
+    return 'CalculationDataMapper';
   }
 
   static checkExistence(hash: string): Promise<Boolean> {
     return new Promise((resolve, reject) => {
       if (!hash) {
-        logger.error('Empty parameter "hash"', {className: CalculationDataMapper.getClassName(), methodName: "checkExistence"});
+        logger.error('Empty parameter "hash"', {
+          className: CalculationDataMapper.getClassName(),
+          methodName: "checkExistence"
+        });
         return reject('Empty parameter "hash"');
       }
-      CalculationDataMapper.getCollection()
-        .then(collection => {
+      Database.connect()
+        .then(db => {
+          let collection: mongodb.Collection = Database.getCollection(db, CalculationDataMapper.CALCULATIONS_COLLECTION_NAME);
           if (!collection) {
-            throw (new DbLayerError('No connection!'));
+            throw (new DbLayerError('No collection!'));
           }
-          collection.find({'hash': hash}).toArray(function (err: mongodb.MongoError, docs: Array<Object>) {
-            curDb.close()
+          collection.find({'hash': hash}).toArray((err: mongodb.MongoError, docs: Array<Object>) => {
+            Database.close(db)
               .then(result => {
                 logger.debug("Database connection closed!", {result: result})
               })
               .catch(err => {
                 logger.error("Database connection have not closed!", {error: err})
               });
+
             if (err) {
               logger.error(`Collection ${collection.collectionName} find error!`, {error: err});
               return reject(new DbLayerError(err));
             }
             logger.info("Found the following records: ", docs);
+
             if (docs.length === 0) {
               return resolve(false);
             } else if (docs.length === 1) {
@@ -69,7 +62,41 @@ export default class CalculationDataMapper {
 
   static create(calculation: Calculation): Promise<mongodb.ObjectID> {
     return new Promise((resolve, reject) => {
+      Database.connect()
+        .then(db => {
+          let collection: mongodb.Collection = Database.getCollection(db, CalculationDataMapper.CALCULATIONS_COLLECTION_NAME);
+          if (!collection) {
+            throw (new DbLayerError('No collection!'));
+          }
+          collection.insertOne(calculation, (err: mongodb.MongoError, result: mongodb.InsertOneWriteOpResult) => {
+            Database.close(db)
+              .then(result => {
+                logger.debug("Database connection closed!", {result: result})
+              })
+              .catch(err => {
+                logger.error("Database connection have not closed!", {error: err})
+              });
 
+            if (err) {
+              logger.error(`Collection ${collection.collectionName} find error!`, {error: err});
+              return reject(new DbLayerError(err));
+            }
+            logger.info("Inserted the following calculation", {calculation: calculation, insertResult: result});
+
+            if (result.insertedCount === 1) {
+              return resolve(result.insertedId);
+            } else if (result.insertedCount === 0) {
+              return resolve(null);
+            } else {
+              // calculation must be only one in collection
+              return reject(new DbLayerError('Too many insert in calculations'));
+            }
+          });
+        })
+        .catch(err => {
+          logger.error('Database layer error', {error: err});
+          return reject(new DbLayerError(err));
+        });
     });
   }
 
@@ -81,7 +108,7 @@ export default class CalculationDataMapper {
 
   static remove(attribute): Promise<Boolean> {
     return new Promise((resolve, reject) => {
-
+      console.log('attribute type: ', typeof attribute);
       if (typeof attribute === "object") {
         // attribute must be Calculation object
       }

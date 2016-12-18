@@ -6,7 +6,7 @@
     "url": "mongodb://localhost:27017/optimize_test"
   },
   "task": {
-    "minComplexity": 3,
+    "minComplexity": 20,
     "sawWidthWarningThreshold": 9
   }
 }

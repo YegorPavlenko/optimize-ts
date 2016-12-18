@@ -2,5 +2,9 @@
   "server": {
     "port": 3000
   },
-  "mongodb": {}
+  "mongodb": {},
+  "task": {
+    "minComplexity": 20,
+    "sawWidthWarningThreshold": 9
+  }
 }

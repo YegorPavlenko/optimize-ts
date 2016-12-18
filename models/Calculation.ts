@@ -14,6 +14,7 @@ export default class Calculation {
 
   createHash(): string {
     // TODO create stringify by myself and add hash function
+    // TODO check if calculation is good enough to create hash on it
     this.normalize();
     this.hash = JSON.stringify(this);
     return this.hash;

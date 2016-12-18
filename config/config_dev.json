@@ -1,4 +1,12 @@
 {
-  "server": {"port": 3000},
-  "mongodb": {"url": "mongodb://localhost:27017/optimize"}
+  "server": {
+    "port": 3000
+  },
+  "mongodb": {
+    "url": "mongodb://localhost:27017/optimize"
+  },
+  "task": {
+    "minComplexity": 3,
+    "sawWidthWarningThreshold": 9
+  }
 }

@@ -3,8 +3,6 @@ import ProcessCalculationResults from "../models/CalculationProcessResults";
 import logger from "../logger/winston";
 import CalculationDataMapper from "../db_layer/CalculationDataMapper";
 
-
-
 export default class ProcessCalculation {
   static processCalculation(calculation: Calculation): Promise<ProcessCalculationResults> {
     return new Promise((resolve, reject) => {

@@ -4,7 +4,10 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "NODE_ENV=test mocha ./test/**/*.spec.js"
+    "test": "NODE_ENV=test mocha ./test/**/*.spec.js",
+    "istanbul": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- ./test --ui bdd -R spec -t 5000 --recursive",
+    "remapInstanbul": "./node_modules/.bin/remap-istanbul -i ./coverage/coverage.json -t html -o ./coverage/remap-report",
+    "coverage": "npm run istanbul && npm run remapInstanbul"
   },
   "dependencies": {
     "@types/body-parser": "0.0.33",
@@ -37,7 +40,9 @@
     "@types/mocha": "^2.2.33",
     "@types/sinon": "^1.16.32",
     "chai": "^3.5.0",
+    "istanbul": "^0.4.5",
     "mocha": "^3.1.2",
+    "remap-istanbul": "^0.7.0",
     "sinon": "^1.17.6"
   }
 }

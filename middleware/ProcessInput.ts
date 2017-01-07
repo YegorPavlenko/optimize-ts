@@ -54,6 +54,7 @@ export default class ProcessInput {
 
       minAllowBar = Math.abs(parseInt(requestBody.minAllowBar));
 
+      // TODO check confirmation for warning about: Min allow bar length is more than half length of full bar
       if (minAllowBar > fullBar) {
         logger.error(`Min allow bar length ${minAllowBar} is more than length of full bar ${fullBar}`);
         processInputResults.messages.push(new ClientMessage(`Min allow bar length ${minAllowBar} is more than length of full bar ${fullBar}`));
@@ -62,6 +63,7 @@ export default class ProcessInput {
         processInputResults.messages.push(new ClientMessage(`Min allow bar length ${minAllowBar} is more than half length of full bar ${fullBar}`));
       }
 
+      // TODO check confirmation for warning about: Saw width looks like too thick
       sawWidth = Math.abs(parseInt(requestBody.sawWidth));
       if (sawWidth > fullBar) {
         logger.error(`Saw width is too thick (${sawWidth} mm)`);
@@ -73,6 +75,7 @@ export default class ProcessInput {
 
       minAllowWaste = Math.abs(parseInt(requestBody.minAllowWaste));
 
+      // TODO check confirmation for warning about: Min allow waste length is more than half length of full bar
       if (minAllowWaste > fullBar) {
         logger.error(`Min allow waste length ${minAllowWaste} is more than length of full bar ${fullBar}`);
         processInputResults.messages.push(new ClientMessage(`Min allow waste length ${minAllowWaste} is more than length of full bar ${fullBar}`));
@@ -101,13 +104,6 @@ export default class ProcessInput {
         }
       });
 
-      // logger.info('bars', {bars: bars});
-      // logger.info('minAllowBar', {minAllowBar: minAllowBar});
-      // logger.info('fullBar', {fullBar: fullBar});
-      // logger.info('sawWidth', {sawWidth: sawWidth});
-      // logger.info('minAllowWaste', {minAllowWaste: minAllowWaste});
-      // logger.info('remnants', {remnants: remnants});
-
       calculation.bars = bars;
       calculation.fullBar = fullBar;
       calculation.minAllowBar = minAllowBar;
@@ -120,8 +116,4 @@ export default class ProcessInput {
     });
   }
 
-  // static validateBars(bars: Calculation): Calculation {
-  //   return
-  //
-  // }
 }
